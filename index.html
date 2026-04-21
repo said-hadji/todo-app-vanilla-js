@@ -1,0 +1,355 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+
+    <link href="output.css" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: "Inter", sans-serif;
+        }
+
+        ::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!--  -->
+    <div class="flex">
+
+        <!-- Side Bar parent -->
+        <div id="sideBarParent" class="hidden lg:block">
+
+            <div id="sideBarOverlay" class="fixed top-0 left-0 w-full h-screen bg-black/50 z-50 lg:hidden"></div>
+
+            <!-- Side Bar -->
+            <div id="sideBar"
+                class="fixed top-0 left-0 w-64 h-screen bg-gray-50 dark:bg-black border-r border-gray-200 dark:border-[#1E3E62] shadow-sm flex flex-col justify-between -translate-x-full lg:translate-x-0 duration-300 z-50">
+
+                <div class="sticky top-0 left-0 flex flex-col gap-8 p-4">
+
+                    <div class="flex justify-between">
+                        <h1 class="sideBarText text-2xl dark:text-white font-bold">ToDo App</h1>
+                        <button id="hideSideBar" class="cursor-pointer lg:hidden"><i
+                                class="fa-solid fa-xmark text-gray-600"></i></button>
+                    </div>
+
+                    <div class="flex flex-col gap-2">
+
+                        <button data-list="today"
+                            class="list flex justify-between text-black dark:text-white bg-gray-200 dark:bg-[#0B192C] rounded-lg px-2 py-2 duration-500 cursor-pointer">
+                            <div class="flex gap-2">
+                                <span class="material-symbols-outlined">
+                                    calendar_today
+                                </span>
+                                <h2>Today</h2>
+                            </div>
+                            <div
+                                class="numberOfTodayTasks w-auto h-6 flex items-center justify-center bg-[#FF6500] dark:bg-[#FF6500z] text-white font-medium rounded-sm px-2">
+                                0
+                            </div>
+                        </button>
+
+                        <button data-list="upcomming"
+                            class="list flex justify-between text-black/70 dark:text-white/70 hover:text-black hover:dark:text-white hover:bg-gray-200 hover:dark:bg-[#0B192C] rounded-lg px-2 py-2 duration-500 cursor-pointer">
+                            <div class="flex gap-2">
+                                <span class="material-symbols-outlined">
+                                    double_arrow
+                                </span>
+                                <h2>Upcomming</h2>
+                            </div>
+                            <div
+                                class="numberOfUpcomingTasks w-auto h-6 flex items-center justify-center bg-blue-500 text-white font-medium rounded-sm px-2">
+                                0
+                            </div>
+                        </button>
+
+                        <button data-list="completed"
+                            class="list flex justify-between text-black/70 dark:text-white/70 hover:text-black hover:dark:text-white hover:bg-gray-200 hover:dark:bg-[#0B192C] rounded-lg px-2 py-2 duration-500 cursor-pointer">
+                            <div class="flex gap-2">
+                                <span class="material-symbols-outlined">
+                                    assignment_turned_in
+                                </span>
+                                <h2>Completed</h2>
+                            </div>
+                            <div
+                                class="numberOfCompletedTasks w-auto h-6 flex items-center justify-center bg-green-600 text-white font-medium rounded-sm px-2">
+                                0
+                            </div>
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <div class="p-4">
+                    <button id="openSettingBtn"
+                        class="sideBarText w-full flex gap-2 text-start text-black/70 dark:text-white/70 hover:text-black hover:dark:text-white hover:bg-gray-200 hover:dark:bg-[#0B192C] rounded-lg px-2 py-2 duration-500 cursor-pointer">
+                        <span class="material-symbols-outlined">
+                            settings
+                        </span>
+                        <h2>Setting</h2>
+                    </button>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Setting -->
+        <div data-setting-panel
+            class="fixed top-0 left-0 w-full h-screen bg-black/80 flex justify-center items-center z-50 hidden">
+
+            <div data-setting
+                class=" w-full sm:w-xl h-96 bg-white dark:bg-[#0B192C] border border-[#1E3E62] m-4 rounded-2xl">
+                <div class="flex justify-between items-center p-4">
+                    <h1 class="text-xl dark:text-white font-medium">Setting</h1>
+                    <button id="closeSettingBtn"
+                        class="text-black/50 dark:text-white/50 hover:text-black hover:dark:text-white duration-500 cursor-pointer"><i
+                            class="fa-solid fa-xmark"></i></button>
+                </div>
+
+                <hr class="text-black/10 dark:text-white/10">
+
+                <div class="flex flex-col gap-4 p-4">
+                    <span class="dark:text-white">Change Todo app theme</span>
+
+                    <div class="flex gap-2">
+                        <div data-key="default"
+                            class="color w-10 h-10 bg-linear-to-b from-[#0B192C] to-[#1E3E62] border-2 border-[#FF6500] rounded-md cursor-pointer">
+                        </div>
+                        <div data-key="blue"
+                            class="color w-10 h-10 bg-linear-to-b from-blue-950 to-blue-700 rounded-md cursor-pointer">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Today -->
+        <div id="todaySection" data-section="today" class="todoSection flex-1 dark:bg-[#0B192C] lg:ml-64">
+
+            <div class="container mx-auto w-full xl:w-4xl h-screen flex flex-col gap-10 p-4">
+
+                <div class="w-full h-fit">
+                    <button class="showSideBar mb-8 lg:hidden cursor-pointer"><i
+                            class="fa-solid fa-bars text-xl dark:text-white"></i></button>
+
+                    <div class="flex gap-4">
+                        <h1 class="text-3xl lg:text-5xl dark:text-white font-bold">Today</h1>
+                        <span
+                            class="numberOfTodayTasks w-auto h-6 bg-[#FF6500] text-white font-bold flex justify-center items-center rounded-sm px-2">
+                            0
+                        </span>
+                    </div>
+
+                    <button id="addNewTaskBtn"
+                        class="w-full text-start text-lg text-[#FF6500] hover:text-[#ff660096] border-b border-[#FF6500] hover:border-[#ff660096] py-2 mt-18 cursor-pointer">
+                        + Add Task
+                    </button>
+
+                    <div id="addNewTaskCard" class="mt-20 hidden">
+
+                        <div
+                            class="w-full bg-gray-50 dark:bg-black border border-gray-300 dark:border-[#1E3E62] rounded-2xl shadow-[0_0px_10px_rgba(0,0,0,0.1)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.3)] overflow-hidden">
+                            <textarea id="taskInput" maxlength="250" placeholder="Add Task" rows="1"
+                                class="w-full dark:text-white font-medium focus:outline-none px-4 py-2 resize-none"></textarea>
+                            <hr class="text-gray-200 dark:text-[#1e3e6270]">
+                            <textarea id="description" maxlength="500" placeholder="Add Description"
+                                class="w-full dark:text-white text-sm font-normal focus:outline-none resize-none px-4 py-2"></textarea>
+                            <hr class="text-gray-200 dark:text-[#1e3e6270]">
+
+                            <div class="flex justify-end px-2 py-2">
+                                <button id="addTaskBtn"
+                                    class="text-white text-sm font-medium bg-[#FF6500] px-10 py-2 rounded-sm shadow-sm cursor-pointer">Add</button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="flex-1 w-full min-h-0 flex flex-col items-center justify-center p-4">
+                    <span class="todayEmptyMessage text-lg text-black/50 dark:text-white/50">Your today
+                        tasks
+                        will appear here</span>
+                    <div id="todayTasks" class="todosContainer w-full flex flex-col gap-4 overflow-y-scroll min-h-0">
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Upcomming -->
+        <div id="upcommingSection" data-section="upcomming"
+            class="todoSection flex-1 dark:bg-[#0B192C] lg:ml-64 hidden">
+
+            <div class="container mx-auto w-full xl:w-4xl min-h-screen flex flex-col p-4">
+
+                <div class="w-full">
+                    <button class="showSideBar mb-8 lg:hidden cursor-pointer">
+                        <i class="fa-solid fa-bars text-xl dark:text-white"></i>
+                    </button>
+
+                    <div class="flex gap-4">
+                        <h1 class="text-3xl lg:text-5xl dark:text-white font-bold">Upcomming</h1>
+                        <span
+                            class="numberOfUpcomingTasks w-auto h-6 bg-blue-500 text-white font-bold flex justify-center items-center rounded-sm px-2">
+                            0
+                        </span>
+                    </div>
+
+                    <button id="addNewTaskBtn_U"
+                        class="w-full text-start text-lg text-[#FF6500] hover:text-[#ff660096] border-b border-[#FF6500] hover:border-[#ff660096] py-2 mt-18 cursor-pointer">
+                        + Add Task
+                    </button>
+
+                    <div id="addNewTaskCard_U" class="mt-20 hidden">
+                        <div
+                            class="w-full bg-gray-50 dark:bg-black border border-gray-300 dark:border-[#1E3E62] rounded-2xl shadow-[0_0px_10px_rgba(0,0,0,0.1)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.3)] overflow-hidden">
+                            <textarea id="taskInput_U" maxlength="250" placeholder="Add Task" rows="1"
+                                class="w-full dark:text-white font-medium focus:outline-none px-4 py-2 resize-none"></textarea>
+                            <hr class="text-gray-200 dark:text-[#1e3e6270]">
+                            <textarea id="description_U" maxlength="500" placeholder="Add Description"
+                                class="w-full dark:text-white text-sm font-normal focus:outline-none resize-none px-4 py-2"></textarea>
+                            <hr class="text-gray-200 dark:text-[#1e3e6270]">
+
+                            <div class="flex justify-end gap-2 px-2 py-2">
+                                <input id="dateInput_U" type="date"
+                                    class="text-white text-sm font-medium bg-blue-500 px-2 py-2 rounded-sm shadow-sm focus:outline-none">
+                                <button id="addTaskBtn_U"
+                                    class="text-white text-sm font-medium bg-[#FF6500] px-10 py-2 rounded-sm shadow-sm cursor-pointer">Add</button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="flex-1 w-full min-h-0 grid grid-cols-1 md:grid-cols-2 gap-4 mt-20">
+
+                    <!-- Today Column -->
+                    <div class="w-full flex flex-col min-h-0">
+                        <div
+                            class="upcomingTasks h-[500px] md:h-0 md:flex-1 flex flex-col min-h-0 gap-4 border border-gray-200 dark:border-[#1E3E62] rounded-2xl">
+                            <h1 class="font-bold text-2xl dark:text-white pt-4 pl-4">Today</h1>
+
+                            <div class="flex-1 w-full min-h-0 flex flex-col items-center justify-center p-4">
+                                <span class="todayEmptyMessage text-lg text-black/50 dark:text-white/50">Your today
+                                    tasks
+                                    will appear here</span>
+                                <div id="upcomingTodayTasks"
+                                    class="todosContainer w-full flex flex-col gap-4 overflow-y-scroll min-h-0">
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Upcoming Column -->
+                    <div class="w-full flex flex-col min-h-0">
+                        <div
+                            class="upcomingTasks h-[500px] md:h-0 md:flex-1 flex flex-col min-h-0 gap-4 border border-gray-200 dark:border-[#1E3E62] rounded-2xl">
+                            <h1 class="font-bold text-2xl dark:text-white pt-4 pl-4">Upcoming</h1>
+
+                            <div class="flex-1 w-full min-h-0 flex flex-col items-center justify-center p-4">
+                                <span id="upcomingEmptyMessage" class="text-lg text-black/50 dark:text-white/50">Your
+                                    upcoming
+                                    tasks
+                                    will appear here</span>
+                                <div id="upcomingTasks" class=" w-full flex flex-col gap-4 overflow-y-scroll min-h-0">
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+        <!-- Completed -->
+        <div data-section="completed" class="todoSection flex-1 h-screen dark:bg-[#0B192C] lg:ml-64 hidden">
+
+            <div class="container mx-auto w-full lg:w-4xl h-screen flex flex-col gap-10 p-4">
+
+                <div class="h-28">
+                    <button class="showSideBar mb-8 lg:hidden cursor-pointer"><i
+                            class="fa-solid fa-bars text-xl dark:text-white"></i></button>
+
+                    <div class="flex gap-4">
+                        <h1 class="text-3xl lg:text-5xl dark:text-white font-bold">Completed</h1>
+                        <span
+                            class="numberOfCompletedTasks w-auto h-6 bg-green-600 text-white font-bold flex justify-center items-center rounded-sm px-2">
+                            0
+                        </span>
+                    </div>
+                </div>
+
+                <div class="flex-1 w-full flex flex-col justify-center items-center">
+                    <h2 data-sentence class="font-medium text-xl text-black/50 dark:text-white/50">Your completed tasks
+                        will appear here</h2>
+                    <div id="completedTasks" class=" w-full flex flex-col space-y-4 overflow-y-scroll">
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Edit form -->
+        <div id="editTaskFormParent"
+            class="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black/80 p-4 z-50 hidden">
+
+            <div id="editTaskForm"
+                class="w-full md:w-lg bg-white dark:bg-[#0B192C] dark:border dark:border-[#1E3E62] rounded-2xl p-4 space-y-10">
+
+                <h1 class="font-bold text-xl dark:text-white">Edit Task</h1>
+
+                <div class="flex flex-col gap-4">
+                    <textarea id="taskInput_E" type="text" maxlength="250" rows="1" placeholder="Add Task"
+                        class="bg-gray-200 dark:bg-[#1E3E62] dark:text-white p-4 rounded-lg focus:outline-2 focus:outline-offset-4 focus:outline-[#FF6500] focus:ring-0 resize-none"></textarea>
+                    <textarea name="" id="taskTextarea_E" maxlength="500" placeholder="Add Description"
+                        class="bg-gray-200 dark:bg-[#1E3E62] dark:text-white p-4 rounded-lg focus:outline-2 focus:outline-offset-4 focus:outline-[#FF6500] focus:ring-0 resize-none"></textarea>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <button
+                            class="saveBtn bg-[#FF6500] text-white font-bold rounded-lg py-4 cursor-pointer hover:scale-95 duration-500">Save</button>
+                        <button
+                            class="cancelBtn bg-gray-200 dark:bg-[#1E3E62] dark:text-white rounded-lg py-4 cursor-pointer hover:scale-95 duration-500">Cancel</button>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+<script src="app.js"></script>
+<script src="setting.js"></script>
+
+</html>
