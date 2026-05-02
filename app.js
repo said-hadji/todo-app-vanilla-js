@@ -246,6 +246,32 @@ bindHideEditForm([ui.editForm.modal, ui.editForm.cancelBtn]);
 let todos = JSON.parse(localStorage.getItem("todos")) || [];
 let currentTodo = null;
 
+function createTaskContent(title, description, dateValue) {
+  const content = document.createElement("div");
+  content.className = "space-y-2";
+
+  const taskTitle = document.createElement("h1");
+  taskTitle.className = "font-medium dark:text-white break-words";
+  taskTitle.textContent = title;
+  content.appendChild(taskTitle);
+
+  if (description) {
+    const desc = document.createElement("p");
+    desc.className = "text-sm text-gray-600 dark:text-gray-400 break-words";
+    desc.textContent = description;
+    content.appendChild(desc);
+  }
+
+  if (dateValue) {
+    const date = document.createElement("span");
+    date.className = "text-black/50 dark:text-white/50 text-sm mt-2";
+    date.textContent = dateValue;
+    content.appendChild(date);
+  }
+
+  return content;
+}
+
 function createElements(
   todoId,
   todoTitle,
@@ -258,26 +284,23 @@ function createElements(
   taskItem.className =
     "task-item relative group w-full bg-gray-50 dark:bg-black border border-gray-200 dark:border-[#1E3E62] rounded-2xl p-4 shrink-0 overflow-hidden";
 
-  const taskContent = document.createElement("div");
-  taskContent.className = "space-y-2";
+  const taskContent = createTaskContent(todoTitle, todoDescription, dateValue);
+  const controls = createTaskControls();
 
-  const taskTitle = document.createElement("h1");
-  taskTitle.className = "font-medium dark:text-white break-words";
-  taskTitle.textContent = todoTitle;
+  taskItem.appendChild(taskContent);
 
-  const taskDescription = document.createElement("p");
-  taskDescription.className =
-    "text-sm text-gray-600 dark:text-gray-400 break-words";
-  taskDescription.textContent = todoDescription;
-
-  // ================= maybe I don't need this condition!
-  let date = null;
-  if (dateValue) {
-    date = document.createElement("span");
-    date.className = "text-black/50 dark:text-white/50 text-sm mt-2";
-    date.textContent = dateValue;
+  if (element) {
+    element.appendChild(taskItem);
   }
 
+  return {
+    ...controls,
+    taskContent,
+    taskItem,
+  };
+}
+
+function createTaskControls() {
   const taskControls = document.createElement("div");
   taskControls.className =
     "lg:absolute top-0 right-0 flex gap-2 lg:p-2 mt-4 lg:m-0 lg:opacity-0 lg:group-hover:opacity-100 duration-500";
@@ -310,22 +333,11 @@ function createElements(
     iconText: "undo",
   });
 
-  taskContent.append(taskTitle);
-  taskItem.append(taskContent, taskControls);
-
-  if (element) {
-    element.appendChild(taskItem);
-  }
-
   return {
     taskControls,
     completeTaskBtn,
     editTaskBtn,
     deleteTaskBtn,
-    taskContent,
-    taskDescription,
-    date,
-    taskItem,
     undoTaskBtn,
   };
 }
@@ -356,19 +368,10 @@ function applyTaskUI(elements, todo) {
       elements.editTaskBtn,
       elements.deleteTaskBtn,
     );
-  }
-
-  if (todo.completed) {
+  } else {
     elements.taskControls.appendChild(elements.undoTaskBtn);
   }
-
-  if (todo.description) {
-    elements.taskContent.appendChild(elements.taskDescription);
-  }
-
-  if (elements.date) {
-    elements.taskContent.appendChild(elements.date);
-  }
+  elements.taskItem.appendChild(elements.taskControls);
 }
 
 function placeTaskInSection(taskElements, todo) {
@@ -451,27 +454,46 @@ function findTodo(taskID) {
   return todo;
 }
 
-function handleTaskClick(e) {
+function updateUI() {
+  refreshTodos();
+  renderUpcomingTodos();
+  completedEmptyMessage(ui.completed.emptyMessage, ui.completed.container);
+  todayEmptyMessage(ui.today.emptyMessages, [
+    ui.upcoming.upcomingTodayTasks,
+    ui.today.todayTasks,
+  ]);
+  upcomingEmptyMessage(
+    ui.upcoming.upcomingEmptyMessage,
+    ui.upcoming.upcomingTasks,
+  );
+}
+
+function saveAndUpdate() {
+  updateUI();
+  localStorage.setItem("todos", JSON.stringify(todos)); // new feature!
+}
+
+function getEventData(e) {
   const target = e.target;
   const id = taskId(target);
   if (id === null) return;
   const todo = findTodo(id);
+  return {
+    target,
+    id,
+    todo,
+  };
+}
+
+function handleTaskClick(e) {
+  const data = getEventData(e);
+  if (!data) return;
+  const { target, id, todo } = data;
 
   if (target.closest(".completeBtn")) {
     if (todo) todo.completed = true;
     if (todo.upcoming) todo.upcoming = null;
-    refreshTodos();
-    renderUpcomingTodos();
-    completedEmptyMessage(ui.completed.emptyMessage, ui.completed.container);
-    todayEmptyMessage(ui.today.emptyMessages, [
-      ui.upcoming.upcomingTodayTasks,
-      ui.today.todayTasks,
-    ]);
-    upcomingEmptyMessage(
-      ui.upcoming.upcomingEmptyMessage,
-      ui.upcoming.upcomingTasks,
-    );
-    localStorage.setItem("todos", JSON.stringify(todos)); // new feature!
+    saveAndUpdate();
   } else if (target.closest(".editBtn")) {
     ui.editForm.modal.classList.remove("hidden");
     if (todo) {
@@ -479,39 +501,17 @@ function handleTaskClick(e) {
       ui.editForm.textarea.value = todo.description;
       currentTodo = todo;
     }
-  } else if (target.classList.contains("deleteBtn")) {
+  } else if (target.closest(".deleteBtn")) {
     todos = todos.filter((t) => t.id !== id);
-    refreshTodos();
-    renderUpcomingTodos();
-    completedEmptyMessage(ui.completed.emptyMessage, ui.completed.container);
-    todayEmptyMessage(ui.today.emptyMessages, [
-      ui.upcoming.upcomingTodayTasks,
-      ui.today.todayTasks,
-    ]);
-    upcomingEmptyMessage(
-      ui.upcoming.upcomingEmptyMessage,
-      ui.upcoming.upcomingTasks,
-    );
-    localStorage.setItem("todos", JSON.stringify(todos)); // new feature!
-  } else if (target.classList.contains("undoBtn")) {
+    saveAndUpdate();
+  } else if (target.closest(".undoBtn")) {
     if (todo) todo.completed = false;
     if (todo.upcoming === null) todo.upcoming = true;
-    refreshTodos();
-    renderUpcomingTodos();
-    completedEmptyMessage(ui.completed.emptyMessage, ui.completed.container);
-    todayEmptyMessage(ui.today.emptyMessages, [
-      ui.upcoming.upcomingTodayTasks,
-      ui.today.todayTasks,
-    ]);
-    upcomingEmptyMessage(
-      ui.upcoming.upcomingEmptyMessage,
-      ui.upcoming.upcomingTasks,
-    );
-    localStorage.setItem("todos", JSON.stringify(todos)); // new feature!
+    saveAndUpdate();
   }
 }
 
-function date() {
+function getTodayDate() {
   const date = new Date();
   const yyyy = date.getFullYear();
   const mm = String(date.getMonth() + 1).padStart(2, "0");
@@ -588,7 +588,7 @@ function addUpcomingTask() {
     return;
   }
 
-  const isFuture = date() !== dateInput.value;
+  const isFuture = getTodayDate() !== dateInput.value;
   const isoDate = new Date().toISOString().slice(0, 10);
 
   todos.push({
