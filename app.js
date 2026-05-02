@@ -28,7 +28,7 @@ const ui = {
     container: document.getElementById("completedTasks"),
     emptyMessage: document.querySelector("[data-sentence]"),
     numberOfCompletedTasks: document.querySelectorAll(
-      ".numberOfCompletedTasks"
+      ".numberOfCompletedTasks",
     ),
   },
 
@@ -59,6 +59,22 @@ const ui = {
     containers: document.querySelectorAll(".todosContainer"),
   },
 };
+
+// new feature!
+document.addEventListener("DOMContentLoaded", () => {
+  refreshTodos();
+  renderUpcomingTodos();
+  todayEmptyMessage(ui.today.emptyMessages, [
+    ui.upcoming.upcomingTodayTasks,
+    ui.today.todayTasks,
+  ]);
+  completedEmptyMessage(ui.completed.emptyMessage, ui.completed.container);
+  upcomingEmptyMessage(
+    ui.upcoming.upcomingEmptyMessage,
+    ui.upcoming.upcomingTasks,
+  );
+});
+// =======================
 
 document.addEventListener("click", handleTaskClick);
 
@@ -227,7 +243,7 @@ function bindHideEditForm(elements) {
 }
 bindHideEditForm([ui.editForm.modal, ui.editForm.cancelBtn]);
 
-let todos = [];
+let todos = JSON.parse(localStorage.getItem("todos")) || [];
 let currentTodo = null;
 
 function createElements(
@@ -235,7 +251,7 @@ function createElements(
   todoTitle,
   todoDescription,
   element,
-  dateValue
+  dateValue,
 ) {
   const taskItem = document.createElement("div");
   taskItem.dataset.id = todoId;
@@ -254,10 +270,11 @@ function createElements(
     "text-sm text-gray-600 dark:text-gray-400 break-words";
   taskDescription.textContent = todoDescription;
 
-  const date = document.createElement("span");
-  date.className = "text-black/50 dark:text-white/50 text-sm mt-2";
-
+  // ================= maybe I don't need this condition!
+  let date = null;
   if (dateValue) {
+    date = document.createElement("span");
+    date.className = "text-black/50 dark:text-white/50 text-sm mt-2";
     date.textContent = dateValue;
   }
 
@@ -337,7 +354,7 @@ function applyTaskUI(elements, todo) {
     elements.taskControls.append(
       elements.completeTaskBtn,
       elements.editTaskBtn,
-      elements.deleteTaskBtn
+      elements.deleteTaskBtn,
     );
   }
 
@@ -379,7 +396,13 @@ function renderTodos() {
 
   todos.forEach((todo) => {
     if (!todo.upcoming) {
-      const elements = createElements(todo.id, todo.title, todo.description);
+      const elements = createElements(
+        todo.id,
+        todo.title,
+        todo.description,
+        null,
+        todo.date,
+      );
       applyTaskUI(elements, todo);
       placeTaskInSection(elements, todo);
     }
@@ -446,8 +469,9 @@ function handleTaskClick(e) {
     ]);
     upcomingEmptyMessage(
       ui.upcoming.upcomingEmptyMessage,
-      ui.upcoming.upcomingTasks
+      ui.upcoming.upcomingTasks,
     );
+    localStorage.setItem("todos", JSON.stringify(todos)); // new feature!
   } else if (target.closest(".editBtn")) {
     ui.editForm.modal.classList.remove("hidden");
     if (todo) {
@@ -466,8 +490,9 @@ function handleTaskClick(e) {
     ]);
     upcomingEmptyMessage(
       ui.upcoming.upcomingEmptyMessage,
-      ui.upcoming.upcomingTasks
+      ui.upcoming.upcomingTasks,
     );
+    localStorage.setItem("todos", JSON.stringify(todos)); // new feature!
   } else if (target.classList.contains("undoBtn")) {
     if (todo) todo.completed = false;
     if (todo.upcoming === null) todo.upcoming = true;
@@ -480,8 +505,9 @@ function handleTaskClick(e) {
     ]);
     upcomingEmptyMessage(
       ui.upcoming.upcomingEmptyMessage,
-      ui.upcoming.upcomingTasks
+      ui.upcoming.upcomingTasks,
     );
+    localStorage.setItem("todos", JSON.stringify(todos)); // new feature!
   }
 }
 
@@ -501,12 +527,15 @@ function bindAddTask() {
     return;
   }
 
+  const isoDate = new Date().toISOString().slice(0, 10);
+
   todos.push({
     id: Date.now(),
     title: input.value,
     description: textarea.value,
     completed: false,
     upcoming: false,
+    date: isoDate,
   });
 
   refreshTodos();
@@ -515,6 +544,8 @@ function bindAddTask() {
     ui.upcoming.upcomingTodayTasks,
     ui.today.todayTasks,
   ]);
+
+  localStorage.setItem("todos", JSON.stringify(todos)); // new feature!
 }
 
 const submitTaskButtons = [ui.today.submitBtn];
@@ -531,6 +562,8 @@ function saveEditedTask() {
   renderTodos();
   renderUpcomingTodos();
   hideEditTaskForm();
+
+  localStorage.setItem("todos", JSON.stringify(todos)); // new feature
 }
 
 const saveButtons = [ui.editForm.saveBtn];
@@ -556,6 +589,7 @@ function addUpcomingTask() {
   }
 
   const isFuture = date() !== dateInput.value;
+  const isoDate = new Date().toISOString().slice(0, 10);
 
   todos.push({
     id: Date.now(),
@@ -563,6 +597,7 @@ function addUpcomingTask() {
     description: textarea.value,
     completed: false,
     upcoming: isFuture,
+    date: isFuture ? dateInput.value : isoDate,
   });
 
   hideAddNewTaskCard(ui.upcoming);
@@ -578,9 +613,11 @@ function addUpcomingTask() {
     updateCount();
     upcomingEmptyMessage(
       ui.upcoming.upcomingEmptyMessage,
-      ui.upcoming.upcomingTasks
+      ui.upcoming.upcomingTasks,
     );
   }
+
+  localStorage.setItem("todos", JSON.stringify(todos)); // new feature!
 }
 
 const buttons = [ui.upcoming.submitBtn];
@@ -596,7 +633,7 @@ function renderUpcomingTodos() {
         todo.title,
         todo.description,
         ui.upcoming.upcomingTasks,
-        ui.upcoming.dateInput.value
+        todo.date,
       );
       applyTaskUI(elements, todo);
       placeTaskInSection(elements, todo);
@@ -617,7 +654,9 @@ function completedEmptyMessage(element, container) {
 }
 
 function todayEmptyMessage(elements, containers) {
-  let isToday = todos.some((t) => t.completed === false && t.upcoming === false);
+  let isToday = todos.some(
+    (t) => t.completed === false && t.upcoming === false,
+  );
 
   if (!isToday) {
     elements.forEach((el) => {
