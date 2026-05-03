@@ -60,7 +60,6 @@ const ui = {
   },
 };
 
-// new feature!
 document.addEventListener("DOMContentLoaded", () => {
   refreshTodos();
   renderUpcomingTodos();
@@ -74,7 +73,6 @@ document.addEventListener("DOMContentLoaded", () => {
     ui.upcoming.upcomingTasks,
   );
 });
-// =======================
 
 document.addEventListener("click", handleTaskClick);
 
@@ -470,7 +468,7 @@ function updateUI() {
 
 function saveAndUpdate() {
   updateUI();
-  localStorage.setItem("todos", JSON.stringify(todos)); // new feature!
+  localStorage.setItem("todos", JSON.stringify(todos));
 }
 
 function getEventData(e) {
@@ -545,7 +543,7 @@ function bindAddTask() {
     ui.today.todayTasks,
   ]);
 
-  localStorage.setItem("todos", JSON.stringify(todos)); // new feature!
+  localStorage.setItem("todos", JSON.stringify(todos));
 }
 
 const submitTaskButtons = [ui.today.submitBtn];
@@ -563,7 +561,7 @@ function saveEditedTask() {
   renderUpcomingTodos();
   hideEditTaskForm();
 
-  localStorage.setItem("todos", JSON.stringify(todos)); // new feature
+  localStorage.setItem("todos", JSON.stringify(todos));
 }
 
 const saveButtons = [ui.editForm.saveBtn];
@@ -617,7 +615,7 @@ function addUpcomingTask() {
     );
   }
 
-  localStorage.setItem("todos", JSON.stringify(todos)); // new feature!
+  localStorage.setItem("todos", JSON.stringify(todos));
 }
 
 const buttons = [ui.upcoming.submitBtn];
